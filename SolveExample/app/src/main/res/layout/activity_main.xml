@@ -26,8 +26,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:enabled="false"
-        android:hint="Enter answer"
-        android:inputType="number"
+        android:hint="Answer"
+        android:inputType="numberSigned"
         android:minHeight="48dp"
         tools:ignore="Autofill,HardcodedText" />
 
@@ -52,13 +52,25 @@
         android:enabled="false"
         tools:ignore="HardcodedText" />
 
-    <TextView
-        android:id="@+id/statsTextView"
+    <Button
+        android:id="@+id/stopButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/checkButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
+        android:text="STOP"
+        android:enabled="false"
+        tools:ignore="HardcodedText,VisualLintOverlap" />
+
+
+    <TextView
+        android:id="@+id/statsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/stopButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
         android:text="Correct: 0, Incorrect: 0, Percentage: 0.00%"
         android:textSize="18sp"
         tools:ignore="HardcodedText" />

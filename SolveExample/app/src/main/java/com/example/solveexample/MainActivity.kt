@@ -3,6 +3,8 @@ package com.example.solveexample
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -15,12 +17,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var answerEditText: EditText
     private lateinit var startButton: Button
     private lateinit var checkButton: Button
+    private lateinit var stopButton: Button
     private lateinit var statsTextView: TextView
 
     private var correctAnswers: Int = 0
     private var totalAnswers: Int = 0
 
     private var currentAnswer: Int = 0
+    private var isRunning: Boolean = false
+
+    private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +36,15 @@ class MainActivity : AppCompatActivity() {
         answerEditText = findViewById(R.id.answerEditText)
         startButton = findViewById(R.id.startButton)
         checkButton = findViewById(R.id.checkButton)
+        stopButton = findViewById(R.id.stopButton)
         statsTextView = findViewById(R.id.statsTextView)
 
         startButton.setOnClickListener {
+            isRunning = true
+            startButton.isEnabled = false
+            stopButton.isEnabled = true
             generateExample()
             answerEditText.isEnabled = true
-            startButton.isEnabled = false
             checkButton.isEnabled = true
             exampleTextView.setBackgroundColor(Color.WHITE)
         }
@@ -52,33 +61,54 @@ class MainActivity : AppCompatActivity() {
             updateStats()
             answerEditText.isEnabled = false
             checkButton.isEnabled = false
+
+            answerEditText.setText("")
+
+            handler.postDelayed({
+                if (isRunning) {
+                    generateExample()
+                    answerEditText.isEnabled = true
+                    checkButton.isEnabled = true
+                    exampleTextView.setBackgroundColor(Color.WHITE)
+                }
+            }, 2000)
+        }
+
+        stopButton.setOnClickListener {
+            isRunning = false
             startButton.isEnabled = true
+            stopButton.isEnabled = false
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun generateExample() {
-        val num1 = Random.nextInt(10, 100)
-        val num2 = Random.nextInt(10, 100)
+        val num1 = Random.nextInt(10, 99)
         val operator = listOf('+', '-', '*', '/').random()
+
+        val num2 = when (operator) {
+            '/' -> {
+                var divisor = Random.nextInt(1, 10)
+                while (num1 % divisor != 0) {
+                    divisor = Random.nextInt(1, 10)
+                }
+                divisor
+            }
+            else -> Random.nextInt(10, 99)
+        }
 
         val example = "$num1 $operator $num2"
         currentAnswer = when (operator) {
             '+' -> num1 + num2
             '-' -> num1 - num2
             '*' -> num1 * num2
-            '/' -> {
-                var divisor = num2
-                while (num1 % divisor != 0) {
-                    divisor = Random.nextInt(10, 100)
-                }
-                num1 / divisor
-            }
+            '/' -> num1 / num2
             else -> throw IllegalArgumentException("Unknown operator")
         }
 
         exampleTextView.text = "$example = ?"
     }
+
 
     @SuppressLint("SetTextI18n")
     private fun updateStats() {
